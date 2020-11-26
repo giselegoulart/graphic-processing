@@ -104,7 +104,7 @@ for database, path in pastas:
             
         print(j,"--", img_size1,"x", img_size2, "\n")
        
-#        image_rescaled = rescale(image, 0.5,order=0, anti_aliasing=False)
+        image_rescaled = rescale(image, 0.5,order=3)
 #        print("Redução 50% - Novo tamanho: ",image_rescaled.shape)
 #        plt.imshow(image_rescaled, cmap=plt.cm.gray)
 #        plt.grid(False)
@@ -113,7 +113,7 @@ for database, path in pastas:
 #        plt.show()
 #        plt.clf()
 #        
-#        image_rescaled2 = rescale(image_rescaled, 2,order=0, anti_aliasing=False)
+        image_rescaled2 = rescale(image_rescaled, 2,order=3)
 #        print("Ampliação 100% - Novo tamanho: ",image_rescaled2.shape)
 #        plt.imshow(image_rescaled2, cmap=plt.cm.gray)
 #        plt.grid(False)
@@ -123,24 +123,30 @@ for database, path in pastas:
 #        plt.clf()
         
         
-        pl.figure(figsize=(6, 4))
-        pl.subplot(1, 2, 1)
-        pl.xticks(())
-        pl.yticks(())
+        plt.figure(figsize=(14, 12))
+        plt.subplot(1, 3, 1)
+        plt.xticks(())
+        plt.yticks(())
+        plt.title("Original",fontsize=18)
         plt.imshow(image, cmap=plt.cm.gray)
         
-        pl.subplot(1, 2, 2)
-        pl.xticks(())
-        pl.yticks(())
+        plt.subplot(1, 3, 2)
+        plt.xticks(())
+        plt.yticks(())
+        plt.title("Redução 50%",fontsize=18)
         plt.imshow(image_rescaled, cmap=plt.cm.gray)
         
-        pl.subplot(1, 2, 3)
-        pl.xticks(())
-        pl.yticks(())
+        plt.subplot(1, 3, 3)
+        plt.xticks(())
+        plt.yticks(())
+        plt.title("Ampliação Tam Original",fontsize=18)
         plt.imshow(image_rescaled2, cmap=plt.cm.gray)
-        pl.tight_layout()
-        pl.show()
-        
+        plt.tight_layout()
+        #plt.show()
+        n = j.split('/')[-1]
+        n = n.replace('.png','')
+        plt.savefig("./Resultados/Questao2/"+str(database)+"_"+str(n)+"_"+"bicubica"+".png")
+        plt.clf()
         
         
         
