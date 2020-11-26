@@ -20,6 +20,9 @@ from skimage import img_as_ubyte,img_as_float
 import glob
 import seaborn as sns
 import os
+from skimage.transform import rescale
+
+#%%
 
 def load_images(path):
     list_of_images = glob.glob(path+'*.png')
@@ -44,11 +47,11 @@ def get_reconstructed_image(raw):
     img = Image.fromarray(img)
     return img
 
-
+#%%
 #==============================================================================    
-
+# Questao 1
 #     
-pastas = [#['Escala de Cinza','./benchmarks/gray8bit/'],
+pastas = [['Escala de Cinza','./benchmarks/gray8bit/'],
           ['Diversas','./benchmarks/misc/']]
 
 
@@ -84,4 +87,63 @@ for database, path in pastas:
             plt.clf()
             
 
+#%%
 
+# Questao 2
+
+pastas = [['Escala de Cinza','./benchmarks/gray8bit/'],
+          ['Diversas','./benchmarks/misc/']]
+
+for database, path in pastas:
+    resultados = []
+    list_images = load_images(path)
+    for j in list_images:
+        image = get_image(list_images, j)
+        img_size1 = image.shape[0]
+        img_size2 = image.shape[1]
+            
+        print(j,"--", img_size1,"x", img_size2, "\n")
+       
+#        image_rescaled = rescale(image, 0.5,order=0, anti_aliasing=False)
+#        print("Redução 50% - Novo tamanho: ",image_rescaled.shape)
+#        plt.imshow(image_rescaled, cmap=plt.cm.gray)
+#        plt.grid(False)
+#        plt.xticks([])
+#        plt.yticks([])
+#        plt.show()
+#        plt.clf()
+#        
+#        image_rescaled2 = rescale(image_rescaled, 2,order=0, anti_aliasing=False)
+#        print("Ampliação 100% - Novo tamanho: ",image_rescaled2.shape)
+#        plt.imshow(image_rescaled2, cmap=plt.cm.gray)
+#        plt.grid(False)
+#        plt.xticks([])
+#        plt.yticks([])
+#        plt.show()
+#        plt.clf()
+        
+        
+        pl.figure(figsize=(6, 4))
+        pl.subplot(1, 2, 1)
+        pl.xticks(())
+        pl.yticks(())
+        plt.imshow(image, cmap=plt.cm.gray)
+        
+        pl.subplot(1, 2, 2)
+        pl.xticks(())
+        pl.yticks(())
+        plt.imshow(image_rescaled, cmap=plt.cm.gray)
+        
+        pl.subplot(1, 2, 3)
+        pl.xticks(())
+        pl.yticks(())
+        plt.imshow(image_rescaled2, cmap=plt.cm.gray)
+        pl.tight_layout()
+        pl.show()
+        
+        
+        
+        
+        
+        
+        
