@@ -133,13 +133,13 @@ for database, path in pastas:
         plt.subplot(1, 3, 2)
         plt.xticks(())
         plt.yticks(())
-        plt.title("Redução 50%",fontsize=18)
+        plt.title("Redução",fontsize=18)
         plt.imshow(image_rescaled, cmap=plt.cm.gray)
         
         plt.subplot(1, 3, 3)
         plt.xticks(())
         plt.yticks(())
-        plt.title("Ampliação Tam Original",fontsize=18)
+        plt.title("Ampliação",fontsize=18)
         plt.imshow(image_rescaled2, cmap=plt.cm.gray)
         plt.tight_layout()
         #plt.show()
@@ -147,6 +147,86 @@ for database, path in pastas:
         n = n.replace('.png','')
         plt.savefig("./Resultados/Questao2/"+str(database)+"_"+str(n)+"_"+"bicubica"+".png")
         plt.clf()
+        
+#%%
+        
+#  Questao 3
+        
+pastas = [['Sequencial','./benchmarks/sequencial/'],
+          ]
+          
+for database, path in pastas:
+    resultados = []
+    list_images = load_images(path)
+    print(list_images)
+    #for j in list_images:
+    image1 = get_image(list_images, list_images[3])
+    image2 = get_image(list_images, list_images[2])
+    image3 = get_image(list_images, list_images[0])
+    image4 = get_image(list_images, list_images[1])
+    img_size1 = image1.shape[0]
+    img_size2 = image1.shape[1]
+            
+    
+    f2_f1 = image1.copy()
+    f3_f2 = image1.copy()
+    f4_f3 = image1.copy()    
+
+    for i in range(img_size1):
+        for j in range(img_size2):
+            f2_f1[i,j] = image2[i,j]-image1[i,j]
+            f3_f2[i,j] = image3[i,j]-image2[i,j]
+            f4_f3[i,j] = image4[i,j]-image3[i,j]
+
+    min2_1 = f2_f1.min()         
+    min3_2 = f3_f2.min()
+    min4_3 = f4_f3.min()
+    
+    for i in range(img_size1):
+        for j in range(img_size2):
+            f2_f1[i,j] = f2_f1[i,j] - min2_1
+            f3_f2[i,j] = f3_f2[i,j] - min3_2
+            f4_f3[i,j] = f4_f3[i,j] - min4_3
+
+    max2_1 = f2_f1.max()         
+    max3_2 = f3_f2.max()
+    max4_3 = f4_f3.max()
+    
+    for i in range(img_size1):
+        for j in range(img_size2):
+            f2_f1[i,j] = 255*(f2_f1[i,j]/max2_1)
+            f3_f2[i,j] = 255*(f3_f2[i,j]/max3_2)
+            f4_f3[i,j] = 255*(f4_f3[i,j]/max4_3)
+    
+    
+    reconstructed_image = get_reconstructed_image(f2_f1)
+    plt.imshow(reconstructed_image, cmap=plt.cm.gray)
+    plt.grid(False)
+    plt.xticks([])
+    plt.yticks([])
+    plt.show()
+    plt.clf()
+    
+    reconstructed_image = get_reconstructed_image(f3_f2)
+    plt.imshow(reconstructed_image, cmap=plt.cm.gray)
+    plt.grid(False)
+    plt.xticks([])
+    plt.yticks([])
+    plt.show()
+    plt.clf()
+    
+    reconstructed_image = get_reconstructed_image(f4_f3)
+    plt.imshow(reconstructed_image, cmap=plt.cm.gray)
+    plt.grid(False)
+    plt.xticks([])
+    plt.yticks([])
+    plt.show()
+    plt.clf()
+
+
+
+
+
         
         
         
