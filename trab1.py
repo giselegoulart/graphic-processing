@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 Processamento grafico - trabalho 1
+Alunas: Gisele Goulart e Marvelúcia Almeida
+Programa de Pós GRaduação em Modelagem Computacional
 """
 # Pacotes utilizados
 import io
@@ -31,10 +33,7 @@ def load_images(path):
 
 # Abertura da imagem da URL passada como parametro
 def get_image(list_images, k):
-    #file_descriptor = urllib2.urlopen(image_url)
-    #image_file = io.BytesIO(file_descriptor.read())
     image = Image.open(k)
-    #img_color = image.resize(size, 1)
     img_grey = image.convert('L')
     img = np.array(img_grey, dtype=np.float)
     return img
@@ -50,6 +49,7 @@ def get_reconstructed_image(raw):
 #%%
 #==============================================================================    
 # Questao 1
+# Quantizacao
 #     
 pastas = [['Escala de Cinza','./benchmarks/gray8bit/'],
           ['Diversas','./benchmarks/misc/']]
@@ -90,6 +90,7 @@ for database, path in pastas:
 #%%
 
 # Questao 2
+# Interpolacao
 
 pastas = [['Escala de Cinza','./benchmarks/gray8bit/'],
           ['Diversas','./benchmarks/misc/']]
@@ -104,25 +105,12 @@ for database, path in pastas:
             
         print(j,"--", img_size1,"x", img_size2, "\n")
        
-        image_rescaled = rescale(image, 0.5,order=3)
+        image_rescaled = rescale(image, 0.5,order=1)
         reconstructed_image1 = get_reconstructed_image(image_rescaled)
-#        print("Redução 50% - Novo tamanho: ",image_rescaled.shape)
-#        plt.imshow(image_rescaled, cmap=plt.cm.gray)
-#        plt.grid(False)
-#        plt.xticks([])
-#        plt.yticks([])
-#        plt.show()
-#        plt.clf()
 #        
-        image_rescaled2 = rescale(image_rescaled, 2,order=3)
+        image_rescaled2 = rescale(image_rescaled, 2,order=1)
         reconstructed_image2 = get_reconstructed_image(image_rescaled2)
-#        print("Ampliação 100% - Novo tamanho: ",image_rescaled2.shape)
-#        plt.imshow(image_rescaled2, cmap=plt.cm.gray)
-#        plt.grid(False)
-#        plt.xticks([])
-#        plt.yticks([])
-#        plt.show()
-#        plt.clf()
+
         
         
         plt.figure(figsize=(14, 12))
@@ -147,12 +135,13 @@ for database, path in pastas:
         #plt.show()
         n = j.split('/')[-1]
         n = n.replace('.png','')
-        plt.savefig("./Resultados/Questao2/"+str(database)+"_"+str(n)+"_"+"bicubica"+".png")
+        plt.savefig("./Resultados/Questao2/"+str(database)+"_"+str(n)+"_"+"bilinear"+".png")
         plt.clf()
         
 #%%
         
 #  Questao 3
+#  Subtracao de imagens
         
 pastas = [['Sequencial','./benchmarks/sequencial/'],
           ]
@@ -161,7 +150,6 @@ for database, path in pastas:
     resultados = []
     list_images = load_images(path)
     print(list_images)
-    #for j in list_images:
     image1 = get_image(list_images, list_images[3])
     image2 = get_image(list_images, list_images[2])
     image3 = get_image(list_images, list_images[0])
