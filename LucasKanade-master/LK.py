@@ -50,10 +50,57 @@ def compute_flow_map(u, v, gran=8):
 
     return flow_map
 
+def takePixel(img, i, j):
+    i = i if i >= 0 else 0
+    j = j if j >= 0 else 0    
+    i = i if i < img.shape[0] else img.shape[0] - 1
+    j = j if j < img.shape[1] else img.shape[1] - 1
+    return img[i, j]
+    
+#Numerical derivatives from original paper: http://people.csail.mit.edu/bkph/papers/Optical_Flow_OPT.pdf
+def xDer(img1, img2):
+    res = np.zeros_like(img1)
+    for i in list(range(res.shape[0])):
+        for j in list(range(res.shape[1])):
+            sm = 0
+            sm += int(takePixel(img1, i,     j + 1)) - int(takePixel(img1, i,     j))
+            sm += int(takePixel(img1, i + 1, j + 1)) - int(takePixel(img1, i + 1, j))
+            sm += int(takePixel(img2, i,     j + 1)) - int(takePixel(img2, i,     j))
+            sm += int(takePixel(img2, i + 1, j + 1)) - int(takePixel(img2, i + 1, j))
+            sm /= 4.0
+            res[i, j] = sm
+    return res
 
-'''
-TODO: Add comments for this method
-'''
+def yDer(img1, img2):
+    res = np.zeros_like(img1)
+    for i in list(range(res.shape[0])):
+        for j in list(range(res.shape[1])):
+            sm = 0
+            sm += int(takePixel(img1, i + 1, j    )) - int(takePixel(img1, i, j    ))
+            sm += int(takePixel(img1, i + 1, j + 1)) - int(takePixel(img1, i, j + 1))
+            sm += int(takePixel(img2, i + 1, j    )) - int(takePixel(img2, i, j    ))
+            sm += int(takePixel(img2, i + 1, j + 1)) - int(takePixel(img2, i, j + 1))
+            sm /= 4.0
+            res[i, j] = sm
+    return res
+
+def tDer(img, img2):
+    res = np.zeros_like(img)
+    for i in list(range(res.shape[0])):
+        for j in list(range(res.shape[1])):
+            sm = 0
+            for ii in list(range(i, i + 2)):
+                for jj in list(range(j, j + 2)):
+                    sm += int(takePixel(img2, ii, jj)) - int(takePixel(img, ii, jj))
+            sm /= 4.0
+            res[i, j] = sm
+    return res
+    
+def average(img):
+    kernel = np.ones((5,5),np.float32)/25
+    return cv2.filter2D(img.astype(np.float32), -1, kernel)
+    
+
 def lucas_kanade(im1, im2, win=7):
     Ix = np.zeros(im1.shape)
     Iy = np.zeros(im1.shape)
@@ -62,6 +109,10 @@ def lucas_kanade(im1, im2, win=7):
     Ix[1:-1, 1:-1] = (im1[1:-1, 2:] - im1[1:-1, :-2]) / 2
     Iy[1:-1, 1:-1] = (im1[2:, 1:-1] - im1[:-2, 1:-1]) / 2
     It[1:-1, 1:-1] = im1[1:-1, 1:-1] - im2[1:-1, 1:-1]
+
+#    Ix = xDer(im1, im2)
+#    Iy = yDer(im1, im2)
+#    It = tDer(im1, im2)
 
     params = np.zeros(im1.shape + (5,))
     params[..., 0] = cv2.GaussianBlur(Ix * Ix, (5, 5), 3)
@@ -100,55 +151,6 @@ def lucas_kanade(im1, im2, win=7):
     
     return u, v
     
-def takePixel(img, i, j):
-    i = i if i >= 0 else 0
-    j = j if j >= 0 else 0    
-    i = i if i < img.shape[0] else img.shape[0] - 1
-    j = j if j < img.shape[1] else img.shape[1] - 1
-    return img[i, j]
-    
-#Numerical derivatives from original paper: http://people.csail.mit.edu/bkph/papers/Optical_Flow_OPT.pdf
-def xDer(img1, img2):
-    res = np.zeros_like(img1)
-    for i in list(range(res.shape[0])):
-        for j in list(range(res.shape[1])):
-            sm = 0
-            sm += takePixel(img1, i,     j + 1) - takePixel(img1, i,     j)
-            sm += takePixel(img1, i + 1, j + 1) - takePixel(img1, i + 1, j)
-            sm += takePixel(img2, i,     j + 1) - takePixel(img2, i,     j)
-            sm += takePixel(img2, i + 1, j + 1) - takePixel(img2, i + 1, j)
-            sm /= 4.0
-            res[i, j] = sm
-    return res
-
-def yDer(img1, img2):
-    res = np.zeros_like(img1)
-    for i in list(range(res.shape[0])):
-        for j in list(range(res.shape[1])):
-            sm = 0
-            sm += takePixel(img1, i + 1, j    ) - takePixel(img1, i, j    )
-            sm += takePixel(img1, i + 1, j + 1) - takePixel(img1, i, j + 1)
-            sm += takePixel(img2, i + 1, j    ) - takePixel(img2, i, j    )
-            sm += takePixel(img2, i + 1, j + 1) - takePixel(img2, i, j + 1)
-            sm /= 4.0
-            res[i, j] = sm
-    return res
-
-def tDer(img, img2):
-    res = np.zeros_like(img)
-    for i in list(range(res.shape[0])):
-        for j in list(range(res.shape[1])):
-            sm = 0
-            for ii in list(range(i, i + 2)):
-                for jj in list(range(j, j + 2)):
-                    sm += takePixel(img2, ii, jj) - takePixel(img, ii, jj)
-            sm /= 4.0
-            res[i, j] = sm
-    return res
-    
-def average(img):
-    kernel = np.ones((5,5),np.float32)/25
-    return cv2.filter2D(img.astype(np.float32), -1, kernel)
     
 def hornShunckFlow(img1, img2, alpha):
     img1 = img1.astype(np.float32)
