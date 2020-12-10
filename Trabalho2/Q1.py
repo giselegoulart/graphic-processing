@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Processamento grafico - trabalho 1
+Processamento grafico - trabalho 2
 Alunas: Gisele Goulart e Marvelúcia Almeida
 Programa de Pós GRaduação em Modelagem Computacional
 """
@@ -26,7 +26,7 @@ import os
 from skimage.transform import rescale
 
 #%%
-
+# Leitura das imagens
 def load_images(path):
     list_of_images = glob.glob(path+'*.png')
     return list_of_images
@@ -73,24 +73,18 @@ for database, path in pastas:
         img_size2 = image.shape[1] 
         
         print(j,'\n')
-        
-#        plt.xticks(())
-#        plt.yticks(())
-#        plt.title("Original",fontsize=18)
-#        plt.imshow(get_reconstructed_image(image), cmap=plt.cm.gray)
-#        plt.show()
-#        plt.clf()
 #       
         ruido = np.random.normal(loc=128,scale=20,size=(img_size1,img_size2))
-        ruido = ruido-np.min(ruido)
+        ruido = ruido-ruido.min()
         #print(ruido)
         image_noise = image+ruido #random_noise(image, mode='speckle') 
-        max_image_noise = np.max(image_noise)
+        max_image_noise = image_noise.max()
         for i in range(img_size1):
             for k in range(img_size2):
-                image[i,k] = 255*(image[i,k]/max_image_noise)
+                image_noise[i,k] = int(255*(image_noise[i,k]/max_image_noise))
         
         # DCT
+        print(np.max(image),'\n')
         image_dct = dct_2D(image)
         image_dct_abs = abs(image_dct)
         image_dct_noise = dct_2D(image_noise)
@@ -157,6 +151,7 @@ for database, path in pastas:
         print('DCT Zeros Ruido log: ',(zeros_image_dct_noise_log/(img_size1*img_size2))*100)
         print('\n')
           
+        # Geracao dos resultados graficos
         plt.figure(figsize=(14, 8))
         plt.subplot(2, 3, 1)
         plt.xticks(())
@@ -242,6 +237,7 @@ for database, path in pastas:
         mean_image_dst_log = np.mean(image_dst_log)
         mean_image_dst_noise_log = np.mean(image_dst_noise_log)
         
+        # Geracao dos resultados graficos
         print('DST Max original: ',max_image_dst_abs)
         print('DST Max Ruido: ',max_image_dst_noise_abs)
         print('DST Max original log: ',max_image_dst_log)
@@ -336,7 +332,6 @@ for database, path in pastas:
         zeros_image_dft_log = count3
         zeros_image_dft_noise_log = count4
         
-        
         max_image_dft_abs = np.max(image_dft_abs)
         max_image_dft_noise_abs = np.max(image_dft_noise_abs)
         max_image_dft_log = np.max(image_dft_log)
@@ -352,6 +347,7 @@ for database, path in pastas:
         mean_image_dft_log = np.mean(image_dft_log)
         mean_image_dft_noise_log = np.mean(image_dft_noise_log)
         
+        # Geracao dos resultados graficos
         print('DFT Max original: ',max_image_dft_abs)
         print('DFT Max Ruido: ',max_image_dft_noise_abs)
         print('DFT Max original log: ',max_image_dft_log)
