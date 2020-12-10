@@ -83,8 +83,13 @@ for database, path in pastas:
 #       
         ruido = np.random.normal(loc=128,scale=20,size=(img_size1,img_size2))
         ruido = ruido-np.min(ruido)
-        print(ruido)
+        #print(ruido)
         image_noise = image+ruido #random_noise(image, mode='speckle') 
+        max_image_noise = np.max(image_noise)
+        for i in range(img_size1):
+            for k in range(img_size2):
+                image[i,k] = 255*(image[i,k]/max_image_noise)
+        
         # DCT
         image_dct = dct_2D(image)
         image_dct_abs = abs(image_dct)
@@ -107,31 +112,50 @@ for database, path in pastas:
         mean_image_dct_noise_abs = np.mean(image_dct_noise_abs)
         mean_image_dct_log = np.mean(image_dct_log)
         mean_image_dct_noise_log = np.mean(image_dct_noise_log)
+        count1=0
+        count2=0
+        count3=0
+        count4=0
         
-#        plt.title("Módulo DCT - Sem ruído")        
-#        plt.imshow(get_reconstructed_image(image_dct_abs), cmap='jet')
-#        plt.colorbar()
-#        plt.show()
-#        plt.clf()
+        for i in range(img_size1):
+            for k in range(img_size2):
+                if(image_dct_abs[i,k]<1e-10):
+                    count1+=1
+                if(image_dct_noise_abs[i,k]<1e-10):
+                    count2+=1
+                if(image_dct_log[i,k]<1e-10):
+                    count3+=1
+                if(image_dct_noise_log[i,k]<1e-10):
+                    count4+=1
         
-#        plt.title("Módulo DCT - Com ruído")        
-#        plt.imshow(get_reconstructed_image(image_dct_noise_abs), cmap='jet')
-#        plt.colorbar()
-#        plt.show()
-#        plt.clf()
+        zeros_image_dct_abs =  count1
+        zeros_image_dct_noise_abs = count2
+        zeros_image_dct_log = count3
+        zeros_image_dct_noise_log = count4
         
-#        plt.title("Log Módulo DCT - Sem ruído")        
-#        plt.imshow(get_reconstructed_image(image_dct_log), cmap='jet')
-#        plt.colorbar()
-#        plt.show()
-#        plt.clf()
+        print('DCT Max original: ',max_image_dct_abs)
+        print('DCT Max Ruido: ',max_image_dct_noise_abs)
+        print('DCT Max original log: ',max_image_dct_log)
+        print('DCT Max Ruido log: ',max_image_dct_noise_log)
+        print('\n')
         
-#        plt.title("Log Módulo DCT - Com ruído")        
-#        plt.imshow(get_reconstructed_image(image_dct_noise_log), cmap='jet')
-#        plt.colorbar()
-#        plt.show()
-#        plt.clf()
-          
+        print('DCT Min original: ',min_image_dct_abs)
+        print('DCT Min Ruido: ',min_image_dct_noise_abs)
+        print('DCT Min original log: ',min_image_dct_log)
+        print('DCT Min Ruido log: ',min_image_dct_noise_log)
+        print('\n')
+        
+        print('DCT Media original: ',mean_image_dct_abs)
+        print('DCT Media Ruido: ',mean_image_dct_noise_abs)
+        print('DCT Media original log: ',mean_image_dct_log)
+        print('DCT Media Ruido log: ',mean_image_dct_noise_log)
+        print('\n')  
+        
+        print('DCT Zeros original: ',(zeros_image_dct_abs/(img_size1*img_size2))*100)
+        print('DCT Zeros Ruido: ',(zeros_image_dct_noise_abs/(img_size1*img_size2))*100)
+        print('DCT Zeros original log: ',(zeros_image_dct_log/(img_size1*img_size2))*100)
+        print('DCT Zeros Ruido log: ',(zeros_image_dct_noise_log/(img_size1*img_size2))*100)
+        print('\n')
           
         plt.figure(figsize=(14, 8))
         plt.subplot(2, 3, 1)
@@ -149,34 +173,31 @@ for database, path in pastas:
         plt.subplot(2, 3, 3)
         plt.title("Log Módulo DCT - Sem ruído", fontsize=16)        
         plt.imshow(get_reconstructed_image(image_dct_log), cmap='jet')
-        #plt.colorbar()
+        plt.colorbar(fraction=0.046, pad=0.04)
         
         plt.subplot(2, 3, 4)
         plt.xticks(())
         plt.yticks(())
         plt.title("Com Ruído",fontsize=16)
         plt.imshow(image_noise, cmap=plt.cm.gray)
+        plt.colorbar(fraction=0.046, pad=0.04)
         
         plt.subplot(2, 3, 5)
         plt.title("Módulo DCT - Com ruído", fontsize=16)        
         plt.imshow(get_reconstructed_image(image_dct_noise_abs), cmap='jet')
-        #plt.colorbar()
+        plt.colorbar(fraction=0.046, pad=0.04)
         
         plt.subplot(2, 3, 6)
         plt.title("Log Módulo DCT - Com ruído", fontsize=16)        
         plt.imshow(get_reconstructed_image(image_dct_noise_log), cmap='jet')
-        #plt.colorbar()
+        plt.colorbar(fraction=0.046, pad=0.04)
         plt.tight_layout()
-        
-        plt.show()
-        plt.clf()
-        
-        
 
-#        n = j.split('/')[-1]
-#        n = n.replace('.png','')
-#        plt.savefig("./Resultados/Questao2/"+str(database)+"_"+str(n)+"_"+"bilinear"+".png")
-#        plt.clf()
+        
+        n = j.split('/')[-1]
+        n = n.replace('.png','')
+        plt.savefig("./Resultados/Trabalho2/"+str(database)+"_"+str(n)+"_"+"DCT"+".png")
+        plt.clf()
         
         # DST
         image_dst = dst_2D(image)
@@ -185,6 +206,26 @@ for database, path in pastas:
         image_dst_noise_abs = abs(image_dst_noise) 
         image_dst_log = np.log10(image_dst_abs)
         image_dst_noise_log = np.log10(image_dst_noise_abs)
+        
+        count1=0
+        count2=0
+        count3=0
+        count4=0
+        for i in range(img_size1):
+            for k in range(img_size2):
+                if(image_dst_abs[i,k]<1e-10):
+                    count1+=1
+                if(image_dst_noise_abs[i,k]<1e-10):
+                    count2+=1
+                if(image_dst_log[i,k]<1e-10):
+                    count3+=1
+                if(image_dst_noise_log[i,k]<1e-10):
+                    count4+=1
+        
+        zeros_image_dst_abs =  count1
+        zeros_image_dst_noise_abs = count2
+        zeros_image_dst_log = count3
+        zeros_image_dst_noise_log = count4
         
         max_image_dst_abs = np.max(image_dst_abs)
         max_image_dst_noise_abs = np.max(image_dst_noise_abs)
@@ -201,28 +242,70 @@ for database, path in pastas:
         mean_image_dst_log = np.mean(image_dst_log)
         mean_image_dst_noise_log = np.mean(image_dst_noise_log)
         
-        plt.title("Módulo DST - Sem ruído")        
+        print('DST Max original: ',max_image_dst_abs)
+        print('DST Max Ruido: ',max_image_dst_noise_abs)
+        print('DST Max original log: ',max_image_dst_log)
+        print('DST Max Ruido log: ',max_image_dst_noise_log)
+        print('\n')
+        
+        print('DST Min original: ',min_image_dst_abs)
+        print('DST Min Ruido: ',min_image_dst_noise_abs)
+        print('DST Min original log: ',min_image_dst_log)
+        print('DST Min Ruido log: ',min_image_dst_noise_log)
+        print('\n')
+        
+        print('DST Media original: ',mean_image_dst_abs)
+        print('DST Media Ruido: ',mean_image_dst_noise_abs)
+        print('DST Media original log: ',mean_image_dst_log)
+        print('DST Media Ruido log: ',mean_image_dst_noise_log)
+        print('\n')
+        
+        print('DST Zeros original: ',(zeros_image_dst_abs/(img_size1*img_size2))*100)
+        print('DST Zeros Ruido: ',(zeros_image_dst_noise_abs/(img_size1*img_size2))*100)
+        print('DST Zeros original log: ',(zeros_image_dst_log/(img_size1*img_size2))*100)
+        print('DST Zeros Ruido log: ',(zeros_image_dst_noise_log/(img_size1*img_size2))*100)
+        print('\n')
+        
+        plt.figure(figsize=(14, 8))
+        plt.subplot(2, 3, 1)
+        plt.xticks(())
+        plt.yticks(())
+        plt.title("Original",fontsize=16)
+        plt.imshow(image, cmap=plt.cm.gray)
+        plt.colorbar(fraction=0.046, pad=0.04)
+        
+        plt.subplot(2, 3, 2)
+        plt.title("Módulo DST - Sem ruído", fontsize=16)        
         plt.imshow(get_reconstructed_image(image_dst_abs), cmap='jet')
-        plt.colorbar()
-        plt.show()
-        plt.clf()
+        plt.colorbar(fraction=0.046, pad=0.04)
         
-        plt.title("Módulo DST - Com ruído")        
-        plt.imshow(get_reconstructed_image(image_dst_noise_abs), cmap='jet')
-        plt.colorbar()
-        plt.show()
-        plt.clf()
-        
-        plt.title("Log Módulo DST - Sem ruído")        
+        plt.subplot(2, 3, 3)
+        plt.title("Log Módulo DST - Sem ruído", fontsize=16)        
         plt.imshow(get_reconstructed_image(image_dst_log), cmap='jet')
-        plt.colorbar()
-        plt.show()
-        plt.clf()
+        plt.colorbar(fraction=0.046, pad=0.04)
         
-        plt.title("Log Módulo DST - Com ruído")        
+        plt.subplot(2, 3, 4)
+        plt.xticks(())
+        plt.yticks(())
+        plt.title("Com Ruído",fontsize=16)
+        plt.imshow(image_noise, cmap=plt.cm.gray)
+        plt.colorbar(fraction=0.046, pad=0.04)
+        
+        plt.subplot(2, 3, 5)
+        plt.title("Módulo DST - Com ruído", fontsize=16)        
+        plt.imshow(get_reconstructed_image(image_dst_noise_abs), cmap='jet')
+        plt.colorbar(fraction=0.046, pad=0.04)
+        
+        plt.subplot(2, 3, 6)
+        plt.title("Log Módulo DST - Com ruído", fontsize=16)        
         plt.imshow(get_reconstructed_image(image_dst_noise_log), cmap='jet')
-        plt.colorbar()
-        plt.show()
+        plt.colorbar(fraction=0.046, pad=0.04)
+        plt.tight_layout()
+
+        
+        n = j.split('/')[-1]
+        n = n.replace('.png','')
+        plt.savefig("./Resultados/Trabalho2/"+str(database)+"_"+str(n)+"_"+"DST"+".png")
         plt.clf()
         
         # DFT
@@ -232,6 +315,26 @@ for database, path in pastas:
         image_dft_noise_abs = abs(image_dft_noise) 
         image_dft_log = np.log10(image_dft_abs)
         image_dft_noise_log = np.log10(image_dft_noise_abs)
+        
+        count1=0
+        count2=0
+        count3=0
+        count4=0
+        for i in range(img_size1):
+            for k in range(img_size2):
+                if(image_dft_abs[i,k]<1e-10):
+                    count1+=1
+                if(image_dft_noise_abs[i,k]<1e-10):
+                    count2+=1
+                if(image_dft_log[i,k]<1e-10):
+                    count3+=1
+                if(image_dft_noise_log[i,k]<1e-10):
+                    count4+=1
+                    
+        zeros_image_dft_abs =  count1
+        zeros_image_dft_noise_abs = count2
+        zeros_image_dft_log = count3
+        zeros_image_dft_noise_log = count4
         
         
         max_image_dft_abs = np.max(image_dft_abs)
@@ -249,30 +352,71 @@ for database, path in pastas:
         mean_image_dft_log = np.mean(image_dft_log)
         mean_image_dft_noise_log = np.mean(image_dft_noise_log)
         
-        plt.title("Módulo DFT - Sem ruído")        
+        print('DFT Max original: ',max_image_dft_abs)
+        print('DFT Max Ruido: ',max_image_dft_noise_abs)
+        print('DFT Max original log: ',max_image_dft_log)
+        print('DFT Max Ruido log: ',max_image_dft_noise_log)
+        print('\n')
+        
+        print('DFT Min original: ',min_image_dft_abs)
+        print('DFT Min Ruido: ',min_image_dft_noise_abs)
+        print('DFT Min original log: ',min_image_dft_log)
+        print('DFT Min Ruido log: ',min_image_dft_noise_log)
+        print('\n')
+        
+        print('DFT Media original: ',mean_image_dft_abs)
+        print('DFT Media Ruido: ',mean_image_dft_noise_abs)
+        print('DFT Media original log: ',mean_image_dft_log)
+        print('DFT Media Ruido log: ',mean_image_dft_noise_log)
+        print('\n')
+        
+        print('DFT Zeros original: ',(zeros_image_dft_abs/(img_size1*img_size2))*100)
+        print('DFT Zeros Ruido: ',(zeros_image_dft_noise_abs/(img_size1*img_size2))*100)
+        print('DFT Zeros original log: ',(zeros_image_dft_log/(img_size1*img_size2))*100)
+        print('DFT Zeros Ruido log: ',(zeros_image_dft_noise_log/(img_size1*img_size2))*100)
+        print('\n')
+        
+        plt.figure(figsize=(14, 8))
+        plt.subplot(2, 3, 1)
+        plt.xticks(())
+        plt.yticks(())
+        plt.title("Original",fontsize=16)
+        plt.imshow(image, cmap=plt.cm.gray)
+        plt.colorbar(fraction=0.046, pad=0.04)
+        
+        plt.subplot(2, 3, 2)
+        plt.title("Módulo DFT - Sem ruído", fontsize=16)        
         plt.imshow(get_reconstructed_image(image_dft_abs), cmap='jet')
-        plt.colorbar()
-        plt.show()
-        plt.clf()
+        plt.colorbar(fraction=0.046, pad=0.04)
         
-        plt.title("Módulo DFT - Com ruído")        
-        plt.imshow(get_reconstructed_image(image_dft_noise_abs), cmap='jet')
-        plt.colorbar()
-        plt.show()
-        plt.clf()
-        
-        plt.title("Log Módulo DFT - Sem ruído")        
+        plt.subplot(2, 3, 3)
+        plt.title("Log Módulo DFT - Sem ruído", fontsize=16)        
         plt.imshow(get_reconstructed_image(image_dft_log), cmap='jet')
-        plt.colorbar()
-        plt.show()
-        plt.clf()
+        plt.colorbar(fraction=0.046, pad=0.04)
         
-        plt.title("Log Módulo DFT - Com ruído")        
+        plt.subplot(2, 3, 4)
+        plt.xticks(())
+        plt.yticks(())
+        plt.title("Com Ruído",fontsize=16)
+        plt.imshow(image_noise, cmap=plt.cm.gray)
+        plt.colorbar(fraction=0.046, pad=0.04)
+        
+        plt.subplot(2, 3, 5)
+        plt.title("Módulo DFT - Com ruído", fontsize=16)        
+        plt.imshow(get_reconstructed_image(image_dft_noise_abs), cmap='jet')
+        plt.colorbar(fraction=0.046, pad=0.04)
+        
+        plt.subplot(2, 3, 6)
+        plt.title("Log Módulo DFT - Com ruído", fontsize=16)        
         plt.imshow(get_reconstructed_image(image_dft_noise_log), cmap='jet')
-        plt.colorbar()
-        plt.show()
-        plt.clf()
+        plt.colorbar(fraction=0.046, pad=0.04)
+        plt.tight_layout()
 
+        
+        n = j.split('/')[-1]
+        n = n.replace('.png','')
+        plt.savefig("./Resultados/Trabalho2/"+str(database)+"_"+str(n)+"_"+"DFT"+".png")
+        plt.clf()
         
 
     
